@@ -1,50 +1,90 @@
-# React + TypeScript + Vite
+This repo describes a build issue in the the 5.2.4-beta.2 release of algoliasearch
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Steps to reproduce issue run the following
 
-Currently, two official plugins are available:
+| Note: you will need pnpm installed
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```
+pnpm install
+pnpm build
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+The following is the output when building
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+```bash
+vite v5.4.2 building for production...
+✓ 38 modules transformed.
+x Build failed in 230ms
+error during build:
+node_modules/.pnpm/algoliasearch@5.2.4-beta.2/node_modules/algoliasearch/dist/browser.js (208:9): "Region" is not exported by "node_modules/.pnpm/@algolia+client-abtesting@5.2.4-beta.2/node_modules/@algolia/client-abtesting/dist/builds/browser.js", imported by "node_modules/.pnpm/algoliasearch@5.2.4-beta.2/node_modules/algoliasearch/dist/browser.js".
+file: /path/to/repo/algoliasearch-issue/node_modules/.pnpm/algoliasearch@5.2.4-beta.2/node_modules/algoliasearch/dist/browser.js:208:9
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+206: __reExport(models_exports, client_analytics_star);
+207: __reExport(models_exports, client_abtesting_star);
+208: import { Region as ABTestingRegion } from "@algolia/client-abtesting";
+              ^
+209: import { Region as AnalyticsRegion } from "@algolia/client-analytics";
+210: import {
+
+    at getRollupError (file:///path/to/repo/algoliasearch-issue/node_modules/.pnpm/rollup@4.21.2/node_modules/rollup/dist/es/shared/parseAst.js:392:41)
+    at error (file:///path/to/repo/algoliasearch-issue/node_modules/.pnpm/rollup@4.21.2/node_modules/rollup/dist/es/shared/parseAst.js:388:42)
+    at Module.error (file:///path/to/repo/algoliasearch-issue/node_modules/.pnpm/rollup@4.21.2/node_modules/rollup/dist/es/shared/node-entry.js:13967:16)
+    at Module.traceVariable (file:///path/to/repo/algoliasearch-issue/node_modules/.pnpm/rollup@4.21.2/node_modules/rollup/dist/es/shared/node-entry.js:14414:29)
+    at ModuleScope.findVariable (file:///path/to/repo/algoliasearch-issue/node_modules/.pnpm/rollup@4.21.2/node_modules/rollup/dist/es/shared/node-entry.js:12121:39)
+    at ReturnValueScope.findVariable (file:///path/to/repo/algoliasearch-issue/node_modules/.pnpm/rollup@4.21.2/node_modules/rollup/dist/es/shared/node-entry.js:7467:38)
+    at FunctionBodyScope.findVariable (file:///path/to/repo/algoliasearch-issue/node_modules/.pnpm/rollup@4.21.2/node_modules/rollup/dist/es/shared/node-entry.js:7467:38)
+    at Identifier.bind (file:///path/to/repo/algoliasearch-issue/node_modules/.pnpm/rollup@4.21.2/node_modules/rollup/dist/es/shared/node-entry.js:6941:40)
+    at ArrowFunctionExpression.bind (file:///path/to/repo/algoliasearch-issue/node_modules/.pnpm/rollup@4.21.2/node_modules/rollup/dist/es/shared/node-entry.js:4808:23)
+    at Property.bind (file:///path/to/repo/algoliasearch-issue/node_modules/.pnpm/rollup@4.21.2/node_modules/rollup/dist/es/shared/node-entry.js:4808:23)
+ ELIFECYCLE  Command failed with exit code 1.
+
+```
+
+The following is the output from another (nextjs) project
+
+```bash
+Failed to compile.
+
+../../node_modules/.pnpm/algoliasearch@5.2.4-beta.2/node_modules/algoliasearch/dist/browser.js
+Attempted import error: 'Region' is not exported from '@algolia/client-abtesting' (imported as 'ABTestingRegion').
+
+Import trace for requested module:
+../../node_modules/.pnpm/algoliasearch@5.2.4-beta.2/node_modules/algoliasearch/dist/browser.js
+./src/utils/algolia/client.ts
+./src/utils/algolia/search.ts
+
+../../node_modules/.pnpm/algoliasearch@5.2.4-beta.2/node_modules/algoliasearch/dist/browser.js
+Attempted import error: 'AbtestingClient' is not exported from '@algolia/client-abtesting' (imported as 'AbtestingClient').
+
+Import trace for requested module:
+../../node_modules/.pnpm/algoliasearch@5.2.4-beta.2/node_modules/algoliasearch/dist/browser.js
+./src/utils/algolia/client.ts
+./src/utils/algolia/search.ts
+
+../../node_modules/.pnpm/algoliasearch@5.2.4-beta.2/node_modules/algoliasearch/dist/browser.js
+Attempted import error: 'AdvancedSyntaxFeatures' is not exported from '@algolia/client-search' (imported as 'AdvancedSyntaxFeatures').
+
+Import trace for requested module:
+../../node_modules/.pnpm/algoliasearch@5.2.4-beta.2/node_modules/algoliasearch/dist/browser.js
+./src/utils/algolia/client.ts
+./src/utils/algolia/search.ts
+
+../../node_modules/.pnpm/algoliasearch@5.2.4-beta.2/node_modules/algoliasearch/dist/browser.js
+Attempted import error: 'AlternativesAsExact' is not exported from '@algolia/client-search' (imported as 'AlternativesAsExact').
+
+Import trace for requested module:
+../../node_modules/.pnpm/algoliasearch@5.2.4-beta.2/node_modules/algoliasearch/dist/browser.js
+./src/utils/algolia/client.ts
+./src/utils/algolia/search.ts
+
+../../node_modules/.pnpm/algoliasearch@5.2.4-beta.2/node_modules/algoliasearch/dist/browser.js
+Attempted import error: 'AnalyticsClient' is not exported from '@algolia/client-analytics' (imported as 'AnalyticsClient').
+
+Import trace for requested module:
+../../node_modules/.pnpm/algoliasearch@5.2.4-beta.2/node_modules/algoliasearch/dist/browser.js
+./src/utils/algolia/client.ts
+./src/utils/algolia/search.ts
+
+
+> Build failed because of webpack errors
 ```
